@@ -1,0 +1,144 @@
+.shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.topbar {
+  margin-bottom: 1rem;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  letter-spacing: 0.02em;
+}
+
+.topbar p {
+  margin: 0.3rem 0 0;
+  color: #58617a;
+  font-size: 0.92rem;
+}
+
+.searchPanel {
+  display: grid;
+  gap: 0.4rem;
+  margin-bottom: 0.8rem;
+}
+
+.searchPanel label {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #49526a;
+}
+
+.searchPanel input {
+  width: 100%;
+  border: 1px solid #cfd6ea;
+  background: #ffffff;
+  border-radius: 0.8rem;
+  padding: 0.8rem 0.9rem;
+  font-size: 1rem;
+}
+
+.status {
+  border-radius: 0.7rem;
+  padding: 0.8rem;
+  background: #eaf1ff;
+  color: #27417b;
+  margin-bottom: 0.8rem;
+}
+
+.status.error {
+  background: #ffebee;
+  color: #8f1f2d;
+}
+
+.content {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.customerList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.customerItem {
+  width: 100%;
+  text-align: left;
+  border: 1px solid #dae1f1;
+  background: #ffffff;
+  border-radius: 0.9rem;
+  padding: 0.8rem 0.9rem;
+  display: grid;
+  gap: 0.15rem;
+}
+
+.customerItem .name {
+  font-weight: 650;
+  color: #1f2942;
+}
+
+.customerItem .meta {
+  color: #59617a;
+  font-size: 0.88rem;
+}
+
+.customerItem.active {
+  border-color: #36579e;
+  background: #f1f5ff;
+}
+
+.detailCard {
+  border: 1px solid #dae1f1;
+  border-radius: 1rem;
+  background: linear-gradient(165deg, #ffffff 0%, #f7f9ff 100%);
+  padding: 1rem;
+}
+
+.detailCard h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.15rem;
+}
+
+.detailCard dl {
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.detailCard dt {
+  font-size: 0.76rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #5f6780;
+}
+
+.detailCard dd {
+  margin: 0.18rem 0 0;
+  color: #16203a;
+  font-weight: 600;
+}
+
+@media (min-width: 760px) {
+  .shell {
+    padding: 1.6rem;
+  }
+
+  .content {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+
+  .customerList {
+    max-height: calc(100vh - 220px);
+    overflow: auto;
+    padding-right: 0.25rem;
+  }
+}

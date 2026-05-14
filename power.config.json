@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "appId": "dabbfc16-d8fb-49fd-a9b4-f89f5de690e0",
+  "appDisplayName": "My First Code Power App",
+  "region": "prod",
+  "environmentId": "46d325dc-7193-eb2b-bad6-f39a35c3625b",
+  "description": " ",
+  "buildPath": "./dist",
+  "buildEntryPoint": "index.html",
+  "localAppUrl": "http://localhost:3000",
+  "logoPath": "Default",
+  "connectionReferences": {
+    "8e524d69-9dc5-4a77-863b-dc54aa419611": {
+      "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
+      "displayName": "Logic flows",
+      "dataSources": [
+        "getrecordsfromdefaultbcapi"
+      ],
+      "workflowDetails": {
+        "workflowEntityId": "be645bcb-704f-f111-bec6-000d3ab20ccf",
+        "workflowDisplayName": "Get records from default BC API",
+        "workflowName": "609c39a9-4826-4bae-31a0-3371af4c7bbc"
+      }
+    }
+  },
+  "databaseReferences": {}
+}
