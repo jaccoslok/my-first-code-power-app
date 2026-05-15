@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
+import { IS_LOCAL_BC_DEV_MODE } from './config/devMode'
 import { GetrecordsfromdefaultBCAPIService } from './generated'
+import { fetchBusinessCentralEntity, BCEntitySet } from './services/businessCentralDevApi'
 import './App.css'
+
+
 
 type Customer = {
   id: string
@@ -10,6 +14,40 @@ type Customer = {
   city?: string
   country?: string
   currencyCode?: string
+}
+
+function normalizeCustomers(data: unknown): Customer[] {
+  if (Array.isArray(data)) {
+    return data as Customer[]
+  }
+
+  if (data && typeof data === 'object' && 'value' in data) {
+    const list = (data as { value: unknown }).value
+
+    if (Array.isArray(list)) {
+      return list as Customer[]
+    }
+  }
+
+  return []
+}
+
+async function loadCustomersFromFlow(): Promise<Customer[]> {
+  const result = await GetrecordsfromdefaultBCAPIService.Run({
+    text: 'customers',
+    text_1: '',
+  })
+
+  if (!result.success) {
+    throw new Error(`Flow execution failed: ${result.error?.message || 'Unknown error'}`)
+  }
+
+  return normalizeCustomers(result.data as unknown)
+}
+
+async function loadCustomersFromBusinessCentralDevApi(): Promise<Customer[]> {
+  const filter = import.meta.env.VITE_BC_ODATA_FILTER?.trim()
+  return fetchBusinessCentralEntity<Customer>(BCEntitySet.Customers, filter)
 }
 
 function App() {
@@ -25,54 +63,24 @@ function App() {
       setError(null)
 
       try {
-        console.log('Starting flow call...')
-        console.log('Service:', GetrecordsfromdefaultBCAPIService)
+        const list = IS_LOCAL_BC_DEV_MODE
+          ? await loadCustomersFromBusinessCentralDevApi()
+          : await loadCustomersFromFlow()
 
-        const result = await GetrecordsfromdefaultBCAPIService.Run({
-          text: 'customers',
-          text_1: '',
-        })
-
-        console.log('✅ Flow returned:', result)
-        console.log('result.success:', result.success)
-        console.log('result.data type:', typeof result.data)
-        console.log('result.data:', JSON.stringify(result.data, null, 2))
-        console.log('result.error:', result.error)
-
-        if (!result.success) {
-          throw new Error(`Flow execution failed: ${result.error?.message || 'Unknown error'}`)
-        }
-
-        const data = result.data as unknown
-        console.log('Data from flow:', data)
-
-        let list: Customer[] = []
-
-        if (Array.isArray(data)) {
-          list = data
-        } else if (data && typeof data === 'object') {
-          if ('value' in data && Array.isArray((data as { value: unknown }).value)) {
-            list = (data as { value: Customer[] }).value
-          }
-        }
-
-        console.log('Customers extracted:', list)
         setCustomers(list ?? [])
         setSelected((current) => current ?? list?.[0] ?? null)
 
         if (!list || list.length === 0) {
-          setError('No customers returned from flow.')
+          setError('No customers returned.')
         }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
-        console.error('❌ Error:', errorMessage)
         setError(`Error: ${errorMessage}`)
       } finally {
         setLoading(false)
       }
     }
 
-    console.log('useEffect triggered')
     loadCustomers()
   }, [])
 
@@ -96,11 +104,22 @@ function App() {
   }, [customers, query])
 
   const headerTitle = loading ? 'Loading customers...' : `${filteredCustomers.length} customers`
+  const sourceLabel = IS_LOCAL_BC_DEV_MODE
+    ? `Business Central API (${BCEntitySet.Customers.apiType})`
+    : 'Power Automate flow (getrecordsfromdefaultbcapi.Run)'
 
   return (
     <main className="shell">
       <header className="topbar">
-        <h1>Customers</h1>
+        <div className="titleRow">
+          <h1>Customers</h1>
+          <span
+            className={IS_LOCAL_BC_DEV_MODE ? 'sourceBadge api' : 'sourceBadge flow'}
+            title="Current data source"
+          >
+            Source: {sourceLabel}
+          </span>
+        </div>
         <p>{headerTitle}</p>
       </header>
 

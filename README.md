@@ -84,7 +84,25 @@ Start the dev server:
 npm run dev
 ```
 
-> Note: the Power Automate flow service only executes inside the Power Apps runtime. When running locally, the flow call will hang because there is no Power Apps context. Use `npx power-apps push` and test in the browser to verify flow connectivity.
+For local testing in VS Code, you have two options:
+
+1. Set `VITE_USE_LOCAL_BC_API=true` in `.env.local` to call Business Central Sandbox directly using OAuth2 client credentials.
+2. Leave `VITE_USE_LOCAL_BC_API=false` to keep using the generated Power Automate flow path.
+
+In production (Power Apps runtime), the app uses the generated flow service.
+
+### Local Business Central Scaffold
+
+The local DEV scaffold includes:
+
+- Base URL builder for Business Central API (`v2.0/{tenant}/{environment}/api/{publisher}/{group}/{version}/companies({companyId})`)
+- OAuth2 client credentials request to Azure AD token endpoint
+- Generic entity fetch function (`fetchBusinessCentralEntity<T>(entitySet, filter)`)
+- Optional OData filter through `VITE_BC_ODATA_FILTER`
+
+Use `.env.example` as a template for required values.
+
+> Important: `VITE_` variables are exposed in browser bundles. Use this only for local testing.
 
 ---
 
