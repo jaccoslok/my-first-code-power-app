@@ -1,16 +1,16 @@
 # Business Central Customers — Power Apps Code App
 
-A phone-friendly Power Apps code app that shows a live customer list from Microsoft Dynamics 365 Business Central. Built with React + TypeScript + Vite, deployed as a Power Apps code app, and connected to Business Central through a Power Automate flow.
+A phone-friendly Power Apps code app that shows a live customer list from Microsoft Dynamics 365 Business Central. Built with React + TypeScript + Vite, deployed as a Power Apps code app, and connected through either Power Automate (hosted/runtime path) or a local Vite proxy (local development path).
 
 ---
 
 ## What the App Does
 
-- Loads customers from Business Central on startup via a Power Automate flow
+- Loads customers from Business Central on startup
 - Displays a searchable, scrollable customer list
 - Tap a customer to see details: number, phone, location, and currency
 - Works on phone and desktop
-- All Business Central authentication is handled by Power Automate — no secrets in the app
+- Shows a source badge in the UI indicating whether data comes from Power Automate or Business Central API (default/custom)
 
 ---
 
@@ -18,12 +18,18 @@ A phone-friendly Power Apps code app that shows a live customer list from Micros
 
 ```
 Power Apps (host)
-  └── Code App (React / Vite)
-        └── Power Automate Flow: "Get records from default BC API"
-              └── Business Central API → customers endpoint
+  └── Code App (React)
+    └── Power Automate Flow: "Get records from default BC API"
+      └── Business Central API → customers endpoint
+
+Local Dev (Vite)
+  └── Code App (React)
+    └── Vite Middleware: POST /api/bc/entity
+      ├── Azure AD token endpoint
+      └── Business Central API → customers endpoint
 ```
 
-The app calls the flow using the `GetrecordsfromdefaultBCAPIService` generated service. The flow handles authentication to Business Central and returns the customer data. No credentials are stored in the app.
+The app calls the flow using the `GetrecordsfromdefaultBCAPIService` generated service in hosted/runtime mode. In local mode, the app calls `/api/bc/entity`; Vite middleware performs token acquisition and Business Central calls server-side to avoid browser CORS issues.
 
 ---
 
@@ -86,7 +92,7 @@ npm run dev
 
 For local testing in VS Code, you have two options:
 
-1. Set `VITE_USE_LOCAL_BC_API=true` in `.env.local` to call Business Central Sandbox directly using OAuth2 client credentials.
+1. Set `VITE_USE_LOCAL_BC_API=true` in `.env.local` to use the local Vite proxy (`/api/bc/entity`) for Business Central Sandbox calls.
 2. Leave `VITE_USE_LOCAL_BC_API=false` to keep using the generated Power Automate flow path.
 
 In production (Power Apps runtime), the app uses the generated flow service.
@@ -95,14 +101,18 @@ In production (Power Apps runtime), the app uses the generated flow service.
 
 The local DEV scaffold includes:
 
-- Base URL builder for Business Central API (`v2.0/{tenant}/{environment}/api/{publisher}/{group}/{version}/companies({companyId})`)
-- OAuth2 client credentials request to Azure AD token endpoint
-- Generic entity fetch function (`fetchBusinessCentralEntity<T>(entitySet, filter)`)
+- Vite middleware endpoint: `POST /api/bc/entity`
+- Server-side OAuth2 client credentials request to Azure AD token endpoint (no browser token call)
+- Base URL builder for Business Central API:
+  - Default API: `v2.0/{tenant}/{environment}/api/{version}/companies({companyId})/{entitySet}`
+  - Custom API: `v2.0/{tenant}/{environment}/api/{publisher}/{group}/{version}/companies({companyId})/{entitySet}`
+- Entity registry in code (`BCEntitySet`) with `entitySet` + `apiType` metadata
+- Generic entity fetch function (`fetchBusinessCentralEntity<T>(entity, filter)`)
 - Optional OData filter through `VITE_BC_ODATA_FILTER`
 
 Use `.env.example` as a template for required values.
 
-> Important: `VITE_` variables are exposed in browser bundles. Use this only for local testing.
+> Important: the local proxy runs only in Vite development mode. In production (Power Apps runtime), use the flow path.
 
 ---
 
@@ -158,7 +168,14 @@ power.config.json      App configuration — environment, app ID, flow reference
 
 ## Security Notes
 
-- Business Central client ID and secret live only inside the Power Automate flow configuration
-- The app never handles or stores credentials
+- In production (Power Apps runtime), Business Central authentication is handled by Power Automate
+- In local development mode, credentials are read by Vite middleware from `.env.local`
+- Browser-side token requests are avoided; token exchange is server-side in local dev
 - The flow should be scoped to read-only Business Central API permissions where possible
 - Do not commit `.env.local` to source control
+
+---
+
+## Technical Documentation
+
+See `TECHNICAL_PAPER.md` for the full architecture and schema-focused technical paper.
