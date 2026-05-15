@@ -35,7 +35,7 @@ Navigation
     └── #/customers/:customerId customer detail page
 ```
 
-The app calls the flow using the `GetrecordsfromdefaultBCAPIService` generated service in hosted/runtime mode. In local mode, the app calls `/api/bc/entity`; Vite middleware performs token acquisition and Business Central calls server-side to avoid browser CORS issues.
+The app calls the flow using the `PA_GetRecordsFromBCAPIService` generated service in hosted/runtime mode. In local mode, the app calls `/api/bc/entity`; Vite middleware performs token acquisition and Business Central calls server-side to avoid browser CORS issues.
 
 The app uses `HashRouter` so navigation works reliably in embedded/hosted contexts where server-side route rewrites are not available.
 
@@ -164,12 +164,12 @@ src/
   App.css              Mobile-first styles
   index.css            Global styles
   generated/           Auto-generated flow service and models (do not edit)
-    services/          GetrecordsfromdefaultBCAPIService.ts
-    models/            GetrecordsfromdefaultBCAPIModel.ts
+    services/          PA_GetRecordsFromBCAPIService.ts
+    models/            PA_GetRecordsFromBCAPIModel.ts
     index.ts
 .power/
   schemas/
-    logicflows/        GetrecordsfromdefaultBCAPI.Schema.json
+    logicflows/        PA_GetRecordsFromBCAPI.Schema.json
 power.config.json      App configuration — environment, app ID, flow references
 ```
 

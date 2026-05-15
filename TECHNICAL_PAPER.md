@@ -17,10 +17,10 @@ Primary implementation files:
 - `src/main.tsx`: application bootstrap and `HashRouter` setup.
 - `src/services/businessCentralDevApi.ts`: local dev API client and entity registry.
 - `vite.config.ts`: Vite plugin middleware for local Business Central proxy.
-- `src/generated/services/GetrecordsfromdefaultBCAPIService.ts`: generated Power Automate service client.
-- `src/generated/models/GetrecordsfromdefaultBCAPIModel.ts`: generated flow input model.
+- `src/generated/services/PA_GetRecordsFromBCAPIService.ts`: generated Power Automate service client.
+- `src/generated/models/PA_GetRecordsFromBCAPIModel.ts`: generated flow input model.
 - `power.config.json`: Power Apps app/environment wiring.
-- `.power/schemas/logicflows/GetrecordsfromdefaultBCAPI.Schema.json`: connector OpenAPI schema for flow trigger.
+- `.power/schemas/logicflows/PA_GetRecordsFromBCAPI.Schema.json`: connector OpenAPI schema for flow trigger.
 
 ## 2. Runtime Modes
 ### 2.1 Mode Selection
@@ -32,7 +32,7 @@ Mode selection is controlled by `IS_LOCAL_BC_DEV_MODE` in `src/config/devMode.ts
 ### 2.2 Power Apps Runtime Mode (Flow)
 When local mode is off, the app calls:
 
-- `GetrecordsfromdefaultBCAPIService.Run({ text: 'customers', text_1: '' })`
+- `PA_GetRecordsFromBCAPIService.Run({ text: 'customers', text_1: '' })`
 
 This invokes the solution-aware flow connector in the Power Apps environment.
 
@@ -97,7 +97,7 @@ Current configuration values (instance-specific):
   "connectionReferences": {
     "8e524d69-9dc5-4a77-863b-dc54aa419611": {
       "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
-      "dataSources": ["getrecordsfromdefaultbcapi"],
+      "dataSources": ["pa_getrecordsfrombcapi"],
       "workflowDetails": {
         "workflowName": "609c39a9-4826-4bae-31a0-3371af4c7bbc"
       }
@@ -113,7 +113,7 @@ Interpretation:
 - `connectionReferences` map generated data sources to logic flow connectors.
 
 ## 4.2 Flow Trigger OpenAPI Schema
-From `.power/schemas/logicflows/GetrecordsfromdefaultBCAPI.Schema.json`:
+From `.power/schemas/logicflows/PA_GetRecordsFromBCAPI.Schema.json`:
 
 - Operation: `Run`
 - Path: `/{connectionId}/triggers/manual/run`
@@ -139,7 +139,7 @@ From `.power/schemas/logicflows/GetrecordsfromdefaultBCAPI.Schema.json`:
 }
 ```
 
-Generated TypeScript model in `src/generated/models/GetrecordsfromdefaultBCAPIModel.ts`:
+Generated TypeScript model in `src/generated/models/PA_GetRecordsFromBCAPIModel.ts`:
 
 ```ts
 export interface ManualTriggerInput {
@@ -149,7 +149,7 @@ export interface ManualTriggerInput {
 ```
 
 ## 4.3 Generated Service Contract
-From `src/generated/services/GetrecordsfromdefaultBCAPIService.ts`:
+From `src/generated/services/PA_GetRecordsFromBCAPIService.ts`:
 
 ```ts
 public static async Run(input: ManualTriggerInput): Promise<IOperationResult<void>>
@@ -264,7 +264,7 @@ The app exposes:
 Header badge indicates active source:
 
 - `Business Central API (default|custom)` in local mode.
-- `Power Automate flow (getrecordsfromdefaultbcapi.Run)` in hosted mode.
+- `Power Automate flow (pa_getrecordsfrombcapi.Run)` in hosted mode.
 
 This improves runtime observability and reduces environment confusion.
 
