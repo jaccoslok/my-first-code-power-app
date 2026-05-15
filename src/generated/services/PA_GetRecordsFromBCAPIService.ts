@@ -4,22 +4,22 @@
  */
 
 import type { IOperationResult } from '@microsoft/power-apps/data';
-import type { ManualTriggerInput } from '../models/GetrecordsfromdefaultBCAPIModel';
+import type { ManualTriggerInput } from '../models/PA_GetRecordsFromBCAPIModel';
 import { dataSourcesInfo } from '../../../.power/schemas/appschemas/dataSourcesInfo';
 import { getClient } from '@microsoft/power-apps/data';
 
-export class GetrecordsfromdefaultBCAPIService {
-  private static readonly dataSourceName = 'getrecordsfromdefaultbcapi';
+export class PA_GetRecordsFromBCAPIService {
+  private static readonly dataSourceName = 'pa_getrecordsfrombcapi';
 
   private static readonly client = getClient(dataSourcesInfo);
 
   public static async Run(input: ManualTriggerInput): Promise<IOperationResult<void>> {
     const params: { input: ManualTriggerInput } = { input };
     const allParams = { ...params, "api-version": "2015-02-01-preview" };
-    const result = await GetrecordsfromdefaultBCAPIService.client.executeAsync<{ input: ManualTriggerInput }, void>(
+    const result = await PA_GetRecordsFromBCAPIService.client.executeAsync<{ input: ManualTriggerInput }, void>(
       {
         connectorOperation: {
-          tableName: GetrecordsfromdefaultBCAPIService.dataSourceName,
+          tableName: PA_GetRecordsFromBCAPIService.dataSourceName,
           operationName: 'Run',
           parameters: allParams
         },

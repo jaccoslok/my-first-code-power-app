@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom'
 import { IS_LOCAL_BC_DEV_MODE } from './config/devMode'
-import { GetrecordsfromdefaultBCAPIService } from './generated'
+import { PA_GetRecordsFromBCAPIService } from './generated'
 import { fetchBusinessCentralEntity, BCEntitySet } from './services/businessCentralDevApi'
 import './App.css'
 
@@ -34,7 +34,7 @@ function normalizeCustomers(data: unknown): Customer[] {
 }
 
 async function loadCustomersFromFlow(): Promise<Customer[]> {
-  const result = await GetrecordsfromdefaultBCAPIService.Run({
+  const result = await PA_GetRecordsFromBCAPIService.Run({
     text: 'customers',
     text_1: '',
   })
@@ -161,7 +161,7 @@ function App() {
   const headerTitle = loading ? 'Loading customers...' : `${filteredCustomers.length} customers`
   const sourceLabel = IS_LOCAL_BC_DEV_MODE
     ? `Business Central API (${BCEntitySet.Customers.apiType})`
-    : 'Power Automate flow (getrecordsfromdefaultbcapi.Run)'
+    : 'Power Automate flow (pa_getrecordsfrombcapi.Run)'
 
   return (
     <main className="shell">

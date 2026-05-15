@@ -1,9 +1,9 @@
 {
-  "name": "Get records from default BC API",
+  "name": "PA_GetRecordsFromBCAPI",
   "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
   "type": "Microsoft.PowerApps/apis",
   "properties": {
-    "displayName": "Get records from default BC API",
+    "displayName": "PA_GetRecordsFromBCAPI",
     "isCustom": false,
     "swagger": {
       "swagger": "2.0",

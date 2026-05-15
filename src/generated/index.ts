@@ -4,7 +4,7 @@
  */
 
 // Models
-export * as GetrecordsfromdefaultBCAPIModel from './models/GetrecordsfromdefaultBCAPIModel';
+export * as PA_GetRecordsFromBCAPIModel from './models/PA_GetRecordsFromBCAPIModel';
 
 // Services
-export * from './services/GetrecordsfromdefaultBCAPIService';
+export * from './services/PA_GetRecordsFromBCAPIService';

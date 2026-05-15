@@ -5,7 +5,7 @@
  */
 
 export const dataSourcesInfo = {
-  "getrecordsfromdefaultbcapi": {
+  "pa_getrecordsfrombcapi": {
     "tableId": "",
     "version": "",
     "primaryKey": "",

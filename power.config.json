@@ -14,11 +14,11 @@
       "id": "/providers/Microsoft.PowerApps/apis/shared_logicflows",
       "displayName": "Logic flows",
       "dataSources": [
-        "getrecordsfromdefaultbcapi"
+        "pa_getrecordsfrombcapi"
       ],
       "workflowDetails": {
         "workflowEntityId": "be645bcb-704f-f111-bec6-000d3ab20ccf",
-        "workflowDisplayName": "Get records from default BC API",
+        "workflowDisplayName": "PA_GetRecordsFromBCAPI",
         "workflowName": "609c39a9-4826-4bae-31a0-3371af4c7bbc"
       }
     }
