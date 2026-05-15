@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router-dom'
 import { IS_LOCAL_BC_DEV_MODE } from './config/devMode'
 import { GetrecordsfromdefaultBCAPIService } from './generated'
 import { fetchBusinessCentralEntity, BCEntitySet } from './services/businessCentralDevApi'
@@ -50,12 +51,67 @@ async function loadCustomersFromBusinessCentralDevApi(): Promise<Customer[]> {
   return fetchBusinessCentralEntity<Customer>(BCEntitySet.Customers, filter)
 }
 
+type CustomerDetailPageProps = {
+  customers: Customer[]
+  loading: boolean
+  error: string | null
+}
+
+function CustomerDetailPage({ customers, loading, error }: CustomerDetailPageProps) {
+  const { customerId } = useParams<{ customerId: string }>()
+  const navigate = useNavigate()
+
+  if (loading) {
+    return <div className="status">Loading customer...</div>
+  }
+
+  if (error) {
+    return <div className="status error">{error}</div>
+  }
+
+  const selected = customers.find((customer) => customer.id === customerId)
+
+  return (
+    <section className="detailPage" aria-live="polite">
+      <button type="button" className="backButton" onClick={() => navigate('/')}>
+        Back to customer list
+      </button>
+
+      {selected ? (
+        <aside className="detailCard">
+          <h2>{selected.displayName}</h2>
+          <dl>
+            <div>
+              <dt>Number</dt>
+              <dd>{selected.number || '-'}</dd>
+            </div>
+            <div>
+              <dt>Phone</dt>
+              <dd>{selected.phoneNumber || '-'}</dd>
+            </div>
+            <div>
+              <dt>Location</dt>
+              <dd>{[selected.city, selected.country].filter(Boolean).join(', ') || '-'}</dd>
+            </div>
+            <div>
+              <dt>Currency</dt>
+              <dd>{selected.currencyCode || '-'}</dd>
+            </div>
+          </dl>
+        </aside>
+      ) : (
+        <div className="status error">Customer not found.</div>
+      )}
+    </section>
+  )
+}
+
 function App() {
   const [customers, setCustomers] = useState<Customer[]>([])
-  const [selected, setSelected] = useState<Customer | null>(null)
   const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     async function loadCustomers() {
@@ -68,7 +124,6 @@ function App() {
           : await loadCustomersFromFlow()
 
         setCustomers(list ?? [])
-        setSelected((current) => current ?? list?.[0] ?? null)
 
         if (!list || list.length === 0) {
           setError('No customers returned.')
@@ -123,72 +178,52 @@ function App() {
         <p>{headerTitle}</p>
       </header>
 
-      <section className="searchPanel">
-        <label htmlFor="customer-search">Search</label>
-        <input
-          id="customer-search"
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search name, number, phone, city"
-          autoComplete="off"
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <>
+              <section className="searchPanel">
+                <label htmlFor="customer-search">Search</label>
+                <input
+                  id="customer-search"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search name, number, phone, city"
+                  autoComplete="off"
+                />
+              </section>
+
+              {error ? <div className="status error">{error}</div> : null}
+              {!error && loading ? <div className="status">Loading list...</div> : null}
+
+              {!loading && !error ? (
+                <section className="content">
+                  <ul className="customerList" aria-label="Customer list">
+                    {filteredCustomers.map((customer) => (
+                      <li key={customer.id}>
+                        <button
+                          type="button"
+                          className="customerItem"
+                          onClick={() => navigate(`/customers/${encodeURIComponent(customer.id)}`)}
+                        >
+                          <span className="name">{customer.displayName}</span>
+                          <span className="meta">#{customer.number}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+            </>
+          }
         />
-      </section>
-
-      {error ? <div className="status error">{error}</div> : null}
-      {!error && loading ? <div className="status">Loading list...</div> : null}
-
-      {!loading && !error ? (
-        <section className="content">
-          <ul className="customerList" aria-label="Customer list">
-            {filteredCustomers.map((customer) => {
-              const active = selected?.id === customer.id
-
-              return (
-                <li key={customer.id}>
-                  <button
-                    type="button"
-                    className={active ? 'customerItem active' : 'customerItem'}
-                    onClick={() => setSelected(customer)}
-                  >
-                    <span className="name">{customer.displayName}</span>
-                    <span className="meta">#{customer.number}</span>
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
-
-          <aside className="detailCard" aria-live="polite">
-            {selected ? (
-              <>
-                <h2>{selected.displayName}</h2>
-                <dl>
-                  <div>
-                    <dt>Number</dt>
-                    <dd>{selected.number || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt>Phone</dt>
-                    <dd>{selected.phoneNumber || '-'}</dd>
-                  </div>
-                  <div>
-                    <dt>Location</dt>
-                    <dd>
-                      {[selected.city, selected.country].filter(Boolean).join(', ') || '-'}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Currency</dt>
-                    <dd>{selected.currencyCode || '-'}</dd>
-                  </div>
-                </dl>
-              </>
-            ) : (
-              <p>Select a customer to see details.</p>
-            )}
-          </aside>
-        </section>
-      ) : null}
+        <Route
+          path="/customers/:customerId"
+          element={<CustomerDetailPage customers={customers} loading={loading} error={error} />}
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </main>
   )
 }

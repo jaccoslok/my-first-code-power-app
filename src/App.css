@@ -157,6 +157,26 @@
   font-weight: 600;
 }
 
+.detailPage {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.backButton {
+  justify-self: start;
+  border: 1px solid #cbd5ec;
+  background: #ffffff;
+  color: #1f3568;
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.backButton:hover {
+  background: #f4f7ff;
+}
+
 @media (min-width: 760px) {
   .shell {
     padding: 1.6rem;

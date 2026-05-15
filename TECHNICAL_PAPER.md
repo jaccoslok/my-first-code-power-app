@@ -9,11 +9,12 @@ This paper describes the architecture, runtime behavior, interface contracts, an
 The design separates UI concerns from integration concerns, provides clear contracts for request/response shapes, and avoids browser-side token exchange in local mode.
 
 ## 1. System Overview
-The app shows a searchable list of Business Central customers and a detail pane for the selected record.
+The app shows a searchable list of Business Central customers and a route-based customer detail page.
 
 Primary implementation files:
 
-- `src/App.tsx`: UI composition, data-source selection, search/filter, and state handling.
+- `src/App.tsx`: UI composition, data-source selection, search/filter, and route-based detail navigation.
+- `src/main.tsx`: application bootstrap and `HashRouter` setup.
 - `src/services/businessCentralDevApi.ts`: local dev API client and entity registry.
 - `vite.config.ts`: Vite plugin middleware for local Business Central proxy.
 - `src/generated/services/GetrecordsfromdefaultBCAPIService.ts`: generated Power Automate service client.
@@ -62,6 +63,25 @@ The Vite middleware performs OAuth token retrieval and Business Central API call
 5. Middleware calls Business Central OData endpoint.
 6. Middleware returns JSON payload to browser.
 7. UI normalizes response and renders list/details.
+
+## 3.3 Navigation Flow
+1. The app is wrapped in `HashRouter` (`src/main.tsx`).
+2. Route `#/` renders search + customer list.
+3. Selecting a customer navigates to `#/customers/:customerId`.
+4. Detail route resolves `customerId` from route params and renders the selected customer.
+5. Back action navigates to `#/`.
+
+Navigation schema (logical):
+
+```json
+{
+  "routes": [
+    { "path": "/", "view": "customer-list" },
+    { "path": "/customers/:customerId", "view": "customer-detail" },
+    { "path": "*", "redirectTo": "/" }
+  ]
+}
+```
 
 ## 4. Schema and Contract Definitions
 ## 4.1 Power Apps App Configuration Schema (power.config.json)
@@ -235,7 +255,12 @@ The app exposes:
 - Empty state message when no customers are returned.
 - Error state message when service calls fail.
 
-### 7.2 Data Source Badge
+### 7.2 Route-Based Detail View
+- Customer list and customer detail are separate routes.
+- Deep-linking to a customer detail route is supported via hash URL.
+- If a route references a missing customer ID, the UI shows `Customer not found.`
+
+### 7.3 Data Source Badge
 Header badge indicates active source:
 
 - `Business Central API (default|custom)` in local mode.

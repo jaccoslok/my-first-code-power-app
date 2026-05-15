@@ -8,7 +8,8 @@ A phone-friendly Power Apps code app that shows a live customer list from Micros
 
 - Loads customers from Business Central on startup
 - Displays a searchable, scrollable customer list
-- Tap a customer to see details: number, phone, location, and currency
+- Tap a customer to open a dedicated customer detail page
+- Customer detail page includes a back action to return to the list
 - Works on phone and desktop
 - Shows a source badge in the UI indicating whether data comes from Power Automate or Business Central API (default/custom)
 
@@ -27,9 +28,16 @@ Local Dev (Vite)
     └── Vite Middleware: POST /api/bc/entity
       ├── Azure AD token endpoint
       └── Business Central API → customers endpoint
+
+Navigation
+  └── HashRouter routes
+    ├── #/                     customer list + search
+    └── #/customers/:customerId customer detail page
 ```
 
 The app calls the flow using the `GetrecordsfromdefaultBCAPIService` generated service in hosted/runtime mode. In local mode, the app calls `/api/bc/entity`; Vite middleware performs token acquisition and Business Central calls server-side to avoid browser CORS issues.
+
+The app uses `HashRouter` so navigation works reliably in embedded/hosted contexts where server-side route rewrites are not available.
 
 ---
 
@@ -151,7 +159,8 @@ npx power-apps push
 
 ```
 src/
-  App.tsx              Main app component — customer list and detail panel
+  App.tsx              Main app component — list route and customer detail route
+  main.tsx             App bootstrap + HashRouter
   App.css              Mobile-first styles
   index.css            Global styles
   generated/           Auto-generated flow service and models (do not edit)
